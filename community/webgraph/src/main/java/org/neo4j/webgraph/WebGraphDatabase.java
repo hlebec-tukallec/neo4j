@@ -1,41 +1,58 @@
+/*
+ * Copyright (c) "Neo4j"
+ * Neo4j Sweden AB [http://neo4j.com]
+ *
+ * This file is part of Neo4j.
+ *
+ * Neo4j is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.neo4j.webgraph;
 
+import it.unimi.dsi.big.webgraph.BidirectionalImmutableGraph;
 import it.unimi.dsi.big.webgraph.LazyLongIterator;
 import it.unimi.dsi.big.webgraph.LazyLongIterators;
+import it.unimi.dsi.big.webgraph.NodeIterator;
+
+import java.util.Iterator;
+
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.internal.helpers.collection.Iterators;
-import org.softwareheritage.graph.SwhBidirectionalGraph;
-import it.unimi.dsi.big.webgraph.NodeIterator;
-
-import java.io.IOException;
-import java.util.Iterator;
-
-import static org.neo4j.webgraph.Utils.NO_ID;
-
+import org.neo4j.webgraph.property.WebGraphPropertyProvider;
 
 public class WebGraphDatabase {
+    public static final long NO_ID = -1;
+    private final BidirectionalImmutableGraph graph;
 
-    private static final String path = Config.getPath();
-    private final SwhBidirectionalGraph graph;
+    private final WebGraphPropertyProvider propertyProvider;
     private final String graphName;
 
     private static WebGraphDatabase singleInstance = null;
 
-    private WebGraphDatabase(SwhBidirectionalGraph graph) {
+    private WebGraphDatabase(BidirectionalImmutableGraph graph, WebGraphPropertyProvider propertyProvider) {
         this.graph = graph;
+        this.propertyProvider = propertyProvider;
         this.graphName = graph.basename().toString();
+    }
+
+    public static void initialise(BidirectionalImmutableGraph graph, WebGraphPropertyProvider propertyProvider) {
+        singleInstance = new WebGraphDatabase(graph, propertyProvider);
     }
 
     public static WebGraphDatabase getSingleInstance() {
         if (singleInstance == null) {
-            try {
-                SwhBidirectionalGraph swhGraph = SwhBidirectionalGraph.loadLabelled(path);
-                swhGraph.loadAuthorTimestamps();
-                singleInstance = new WebGraphDatabase(swhGraph);
-            } catch (IOException e) {
-                //exception
-            }
+            throw new RuntimeException("WebGraphDatabase is not initialised.");
         }
         return singleInstance;
     }
@@ -52,16 +69,12 @@ public class WebGraphDatabase {
         return graph.numArcs();
     }
 
-    public Utils.NodeLabel getSWHNodeType(long nodeId) {
-        return Utils.NodeLabel.toNodeLabel(graph.getNodeType(nodeId).toString());
-    }
-
-    public Object getAuthorTimestamp(long nodeId) {
-        return graph.getAuthorTimestamp(nodeId);
-    }
-
-    public Object getSWHID(long nodeId) {
-        return graph.getSWHID(nodeId);
+    public long nodeDegree(long nodeId, Direction direction) {
+        return switch (direction) {
+            case OUTGOING -> graph.outdegree(nodeId);
+            case INCOMING -> graph.indegree(nodeId);
+            case BOTH -> graph.outdegree(nodeId) + graph.indegree(nodeId);
+        };
     }
 
     public Iterator<WebGraphRelationship> getRelationshipIterator() {
@@ -90,7 +103,8 @@ public class WebGraphDatabase {
                     relationshipId = 0;
                     startNodes = graph.nodeIterator();
                     nextStartNode = startNodes.hasNext() ? startNodes.nextLong() : NO_ID;
-                    endNodes = nextStartNode == NO_ID ? LazyLongIterators.EMPTY_ITERATOR : graph.successors(nextStartNode);
+                    endNodes =
+                            nextStartNode == NO_ID ? LazyLongIterators.EMPTY_ITERATOR : graph.successors(nextStartNode);
                 }
                 assert endNodes != null;
                 nextEndNode = endNodes.nextLong();
@@ -108,10 +122,11 @@ public class WebGraphDatabase {
     }
 
     public Iterator<Relationship> getRelationships(long nodeId, Direction direction) {
-        return switch(direction) {
+        return switch (direction) {
             case OUTGOING -> getOutgoingRelationshipsIterator(nodeId);
             case INCOMING -> getIncomingRelationshipsIterator(nodeId);
-            case BOTH -> Iterators.concat(getOutgoingRelationshipsIterator(nodeId), getIncomingRelationshipsIterator(nodeId));
+            case BOTH -> Iterators.concat(
+                    getOutgoingRelationshipsIterator(nodeId), getIncomingRelationshipsIterator(nodeId));
         };
     }
 
@@ -128,12 +143,10 @@ public class WebGraphDatabase {
                 return new WebGraphRelationship(nodeId, nextEndNode, relationshipId++, WebGraphDatabase.this);
             }
 
-
             @Override
             public boolean hasNext() {
                 return nextRelationship != null;
             }
-
 
             @Override
             public WebGraphRelationship next() {
@@ -162,7 +175,6 @@ public class WebGraphDatabase {
                 return nextRelationship != null;
             }
 
-
             @Override
             public WebGraphRelationship next() {
                 WebGraphRelationship next = nextRelationship;
@@ -173,7 +185,7 @@ public class WebGraphDatabase {
     }
 
     public boolean hasRelationship(long nodeId, Direction direction) {
-        return switch(direction) {
+        return switch (direction) {
             case OUTGOING -> hasOutgoingRelationshipsIterator(nodeId);
             case INCOMING -> hasIncomingRelationshipsIterator(nodeId);
             case BOTH -> hasOutgoingRelationshipsIterator(nodeId) || hasIncomingRelationshipsIterator(nodeId);
@@ -215,5 +227,9 @@ public class WebGraphDatabase {
 
     public Iterator<WebGraphRelationship> resetRelationshipIterator() {
         return getRelationshipIterator();
+    }
+
+    public WebGraphPropertyProvider getPropertyProvider() {
+        return propertyProvider;
     }
 }
