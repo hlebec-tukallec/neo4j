@@ -23,9 +23,9 @@ import org.neo4j.webgraph.property.entities.relationship.propertyGetters.ArcLabe
 import org.neo4j.webgraph.property.entities.relationship.propertyGetters.RelationshipPropertyGetter;
 
 /**
- * Edge property getter based on {@link ArcLabelRelationshipProperty}.
+ * Relationship property getter based on {@link ArcLabelRelationshipProperty}.
  * <p>
- * Allows deconstructing the single WebGraph edge label into separate properties.
+ * Allows deconstructing the single WebGraph relationship label into separate properties.
  */
 public class ArcLabelRelationshipSubProperty<T> extends RelationshipProperty<T> {
 
