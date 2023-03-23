@@ -23,7 +23,7 @@ import it.unimi.dsi.big.webgraph.labelling.ArcLabelledImmutableGraph;
 import org.neo4j.webgraph.property.entities.relationship.propertyGetters.RelationshipPropertyGetter;
 
 /**
- * Edge property getter based on {@link ArcLabelledImmutableGraph}.
+ * Relationship property getter based on {@link ArcLabelledImmutableGraph}.
  */
 public class ArcLabelRelationshipProperty<T> extends RelationshipProperty<T> {
 
