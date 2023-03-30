@@ -3,6 +3,7 @@ package org.neo4j.property;
 import org.neo4j.webgraph.property.WebGraphPropertyProvider;
 import org.softwareheritage.graph.SwhBidirectionalGraph;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,8 +11,9 @@ import java.util.Map;
 public class SwhPropertyProvider implements WebGraphPropertyProvider {
     private final SwhBidirectionalGraph graph;
 
-    public SwhPropertyProvider(SwhBidirectionalGraph graph) {
+    public SwhPropertyProvider(SwhBidirectionalGraph graph) throws IOException {
         this.graph = graph;
+        graph.loadAuthorTimestamps();
     }
 
     @Override
@@ -55,7 +57,7 @@ public class SwhPropertyProvider implements WebGraphPropertyProvider {
         return switch (PropertyUtils.NodeProperty.toNodeProperty(key)) {
             case AUTHOR_TIMESTAMP -> graph.getAuthorTimestamp(nodeId);
             case SWHID -> graph.getSWHID(nodeId);
-            case LABEL -> graph.getNodeType(nodeId);
+            case SWH_TYPE -> graph.getNodeType(nodeId);
             default -> throw new RuntimeException("Unknown node property key: " + key);
         };
     }
@@ -67,7 +69,7 @@ public class SwhPropertyProvider implements WebGraphPropertyProvider {
             properties.put("author_timestamp", graph.getAuthorTimestamp(nodeId));
         }
         properties.put("SWHID", graph.getSWHID(nodeId));
-        properties.put("label", graph.getNodeType(nodeId));
+        properties.put("SWHType", graph.getNodeType(nodeId));
         return properties;
     }
 

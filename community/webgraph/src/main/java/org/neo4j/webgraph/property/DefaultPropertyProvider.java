@@ -164,6 +164,9 @@ public class DefaultPropertyProvider implements WebGraphPropertyProvider {
         for (String prop : allProperties) {
             NodeProperty<?> nodeProperty = nodeProperties.get(prop);
             if (nodeProperty != null) {
+                if (nodeProperty.get(nodeId) == null) {
+                    continue;
+                }
                 allNodeProps.put(prop, nodeProperty.get(nodeId));
             }
         }
