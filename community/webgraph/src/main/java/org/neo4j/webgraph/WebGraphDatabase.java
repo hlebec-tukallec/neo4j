@@ -36,14 +36,12 @@ public class WebGraphDatabase {
     private final BidirectionalImmutableGraph graph;
 
     private final WebGraphPropertyProvider propertyProvider;
-    private final String graphName;
 
     private static WebGraphDatabase singleInstance = null;
 
     private WebGraphDatabase(BidirectionalImmutableGraph graph, WebGraphPropertyProvider propertyProvider) {
         this.graph = graph;
         this.propertyProvider = propertyProvider;
-        this.graphName = graph.basename().toString();
     }
 
     public static void initialise(BidirectionalImmutableGraph graph, WebGraphPropertyProvider propertyProvider) {
@@ -55,10 +53,6 @@ public class WebGraphDatabase {
             throw new RuntimeException("WebGraphDatabase is not initialised.");
         }
         return singleInstance;
-    }
-
-    public String databaseName() {
-        return graphName;
     }
 
     public long getAllNodes() {
