@@ -1,0 +1,82 @@
+digraph "Software Heritage mini DAG" {
+    ranksep=1;
+    nodesep=0.5;
+
+    subgraph cnt {
+        01 [label="cnt:11"];
+        04 [label="cnt:15"];
+        05 [label="cnt:16"];
+        07 [label="cnt:12"];
+        11 [label="cnt:8"];
+        14 [label="cnt:3"];
+        15 [label="cnt:1"];
+    }
+
+    subgraph cluster_dir {
+        label="File contents";
+        node [shape=folder];
+        02 [label="dir:10"];
+        06 [label="dir:14"];
+        08 [label="dir:13"];
+        12 [label="dir:7"];
+        16 [label="dir:0"];
+        17 [label="dir:2"];
+
+        02 -> 01;
+        06 -> 04;
+        06 -> 05;
+        08 -> 01;
+        08 -> 06;
+        08 -> 07;
+        12 -> 08;
+        12 -> 11;
+        16 -> 15;
+        17 -> 14;
+        17 -> 16;
+    }
+
+    subgraph cluster_rev {
+        label="Revisions";
+        node [shape=diamond];
+        03 [label="rev:9"];
+        09 [label="rev:18"];
+        13 [label="rev:6"];
+        18 [label="rev:5"];
+
+        03 -> 02;
+        09 -> 08;
+        13 -> 12;
+        18 -> 17;
+        // horizontal rev -> rev edges
+        09 -> 03 [constraint=false];
+        13 -> 09 [constraint=false];
+        18 -> 13 [constraint=false];
+    }
+
+    subgraph cluster_rel {
+        label="Releases";
+        node [shape=octagon];
+        10 [label="rel:20"];
+        19 [label="rel:4"];
+
+        10 -> 09;
+        19 -> 18;
+    }
+
+    subgraph cluster_snp {
+        label="Snapshots";
+        node [shape=doubleoctagon];
+        20 [label="snp:19"];
+
+        20 -> 09;
+        20 -> 10;
+    }
+
+    subgraph cluster_ori {
+        label="Origins";
+        node [shape=egg];
+        21 [label="ori:17"];
+
+        21 -> 20;
+    }
+}
