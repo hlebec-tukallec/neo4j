@@ -52,7 +52,8 @@ public class PropertyUtils {
     public enum NodeProperty {
         AUTHOR_TIMESTAMP,
         SWHID,
-        LABEL;
+        SWH_TYPE,
+        NO_PROPERTY;
 
         NodeProperty() {
         }
@@ -61,8 +62,8 @@ public class PropertyUtils {
             return switch (intType) {
                 case 1 -> AUTHOR_TIMESTAMP;
                 case 2 -> SWHID;
-                case 3 -> LABEL;
-                default -> null;
+                case 3 -> SWH_TYPE;
+                default -> NO_PROPERTY;
             };
         }
 
@@ -70,7 +71,7 @@ public class PropertyUtils {
             return switch (propertyName) {
                 case AUTHOR_TIMESTAMP -> 1;
                 case SWHID -> 2;
-                case LABEL -> 3;
+                case SWH_TYPE -> 3;
                 default -> -1;
             };
         }
@@ -79,8 +80,8 @@ public class PropertyUtils {
             return switch (propertyName) {
                 case "author_timestamp" -> AUTHOR_TIMESTAMP;
                 case "SWHID" -> SWHID;
-                case "label" -> LABEL;
-                default -> null;
+                case "SWHType" -> SWH_TYPE;
+                default -> NO_PROPERTY;
             };
         }
 
@@ -88,7 +89,7 @@ public class PropertyUtils {
             return switch (propertyName) {
                 case AUTHOR_TIMESTAMP -> "author_timestamp";
                 case SWHID -> "SWHID";
-                case LABEL -> "label";
+                case SWH_TYPE -> "SWHType";
                 default -> null;
             };
         }

@@ -7,7 +7,7 @@ import org.softwareheritage.graph.SwhBidirectionalGraph;
 import java.io.IOException;
 
 /**
- * Main class to run Cypher queries in Neo4j on Software Heritage's graphs.
+ * Main class to run Cypher queries on Software Heritage's graphs.
  * Usage: Main [path] [query] [optional: path, where to store logs]
  */
 public class Main {
@@ -28,7 +28,6 @@ public class Main {
         WebGraphExecutor executor = new WebGraphExecutor();
         SwhBidirectionalGraph swhGraph =
                 SwhBidirectionalGraph.loadLabelled(path);
-        swhGraph.loadAuthorTimestamps();
         SwhPropertyProvider propertyProvider = new SwhPropertyProvider(swhGraph);
 
         executor.initialise(swhGraph, propertyProvider, logsPath);

@@ -78,6 +78,7 @@ public class WebGraphNodeIterator {
                 startNode = currentNode;
             }
         } else {
+            previousNode = currentNode;
             currentNode = null;
             currentId = WebGraphDatabase.NO_ID;
         }
