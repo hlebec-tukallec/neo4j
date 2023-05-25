@@ -80,6 +80,9 @@
     <module>capabilities</module>
     <module>storage-engine-util</module>
     <module>bootcheck</module>
+    <module>webgraph</module>
+    <module>swh</module>
+    <module>webGraph-executor</module>
   </modules>
 
   <licenses>
